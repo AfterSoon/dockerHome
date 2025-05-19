@@ -69,7 +69,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/your-repo-name:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/your-repo-name:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/your-repo-name:${{ github.sha }}
           build-args: |
             SECRET_KEY=${{ secrets.SECRET_KEY }}
 
