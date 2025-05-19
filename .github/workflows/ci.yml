@@ -73,8 +73,11 @@ jobs:
           build-args: |
             SECRET_KEY=${{ secrets.SECRET_KEY }}
 
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/online_work:${{ github.sha }}
+      - name: Debug Docker tag
+        run:
+          echo "Tag is: '${{ secrets.DOCKER_HUB_USERNAME }}/online_work:${{ github.sha }}'"
+        
+  
 
   deploy:
     needs: build
