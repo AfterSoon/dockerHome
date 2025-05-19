@@ -72,11 +72,9 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}$online_work:${{ github.sha }}
           build-args: |
             SECRET_KEY=${{ secrets.SECRET_KEY }}
-
-      - name: Debug Docker tag
-        run:
-          echo "Tag is: '${{ secrets.DOCKER_HUB_USERNAME }}/online_work:${{ github.sha }}'"
         
+  
+  
   
 
   deploy:
