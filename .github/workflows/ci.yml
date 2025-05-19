@@ -1,10 +1,14 @@
 name: Django CI
 
-on: [ push, pull_request ]
+on: [push, pull_request]
 
 env:
   SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
   ANOTHER_VAR: value
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   lint:
@@ -25,7 +29,6 @@ jobs:
 
       - name: Run flake8
         run: flake8 .
-
 
   test:
     needs: lint
@@ -72,13 +75,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}online_work:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/online_work:${{ github.sha }}
           build-args: |
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
-        
-  
-  
-  
+            SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
 
   deploy:
     needs: build
