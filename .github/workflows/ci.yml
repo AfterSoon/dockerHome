@@ -82,6 +82,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    if: secrets.SSH_KEY != '' && secrets.SSH_USER != '' && secrets.SERVER_IP != '' # Условие выполнения всего job
 
     steps:
       - name: Check out code
@@ -92,21 +93,34 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Verify SSH secrets
+        run: |
+          echo "Проверка наличия секретов:"
+          echo "SSH_KEY: ${{ secrets.SSH_KEY != '' && 'установлен' || 'НЕ установлен' }}"
+          echo "SSH_USER: ${{ secrets.SSH_USER != '' && 'установлен' || 'НЕ установлен' }}"
+          echo "SERVER_IP: ${{ secrets.SERVER_IP != '' && 'установлен' || 'НЕ установлен' }}"
+
       - name: Verify SSH connection
         run: |
-          echo "Testing SSH connection to server..."
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-              -v \
-              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'SSH connection successful!'"
+          echo "Тестирование SSH подключения..."
+          ssh -vvv -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" \
+              "echo 'SSH подключение успешно!'"
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
-              docker pull morgaun/online_work:test && \
-              docker stop online_work || true && \
-              docker rm online_work || true && \
-              docker run -d --name online_work -p 80:8000 \
+          ssh -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" \
+              "docker pull morgaun/online_work:test && \
+               docker stop online_work || true && \
+               docker rm online_work || true && \
+               docker run -d --name online_work -p 80:8000 \
                   -e SECRET_KEY='${{ secrets.DJANGO_SECRET_KEY }}' \
-                  morgaun/online_work:test
-          "
+                  morgaun/online_work:test"
+
+      - name: Skip deploy notification
+        if: secrets.SSH_KEY == '' || secrets.SSH_USER == '' || secrets.SERVER_IP == ''
+        run:
+          echo "Деплой пропущен: отсутствуют необходимые SSH-секреты"
