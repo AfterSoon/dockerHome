@@ -92,13 +92,21 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Verify SSH connection
+        run: |
+          echo "Testing SSH connection to server..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+              -v \
+              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'SSH connection successful!'"
+
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/online_work:test
-          docker stop online_work || true
-          docker rm online_work || true
-          docker run -d --name online_work -p 80:8000 \
-              ${{ secrets.DOCKER_HUB_USERNAME }}/online_work:test
-          EOF
+              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+              docker pull morgaun/online_work:test && \
+              docker stop online_work || true && \
+              docker rm online_work || true && \
+              docker run -d --name online_work -p 80:8000 \
+                  -e SECRET_KEY='${{ secrets.DJANGO_SECRET_KEY }}' \
+                  morgaun/online_work:test
+          "
