@@ -1,6 +1,6 @@
 name: Django CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 env:
   SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
@@ -82,7 +82,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: secrets.SSH_KEY != '' && secrets.SSH_USER != '' && secrets.SERVER_IP != '' # Условие выполнения всего job
+    if: ${{ secrets.SSH_KEY != '' && secrets.SSH_USER != '' && secrets.SERVER_IP != '' }}
 
     steps:
       - name: Check out code
@@ -95,18 +95,18 @@ jobs:
 
       - name: Verify SSH secrets
         run: |
-          echo "Проверка наличия секретов:"
-          echo "SSH_KEY: ${{ secrets.SSH_KEY != '' && 'установлен' || 'НЕ установлен' }}"
-          echo "SSH_USER: ${{ secrets.SSH_USER != '' && 'установлен' || 'НЕ установлен' }}"
-          echo "SERVER_IP: ${{ secrets.SERVER_IP != '' && 'установлен' || 'НЕ установлен' }}"
+          echo "Checking secrets:"
+          echo "SSH_KEY: ${{ secrets.SSH_KEY != '' && 'SET' || 'NOT SET' }}"
+          echo "SSH_USER: ${{ secrets.SSH_USER != '' && 'SET' || 'NOT SET' }}"
+          echo "SERVER_IP: ${{ secrets.SERVER_IP != '' && 'SET' || 'NOT SET' }}"
 
       - name: Verify SSH connection
         run: |
-          echo "Тестирование SSH подключения..."
+          echo "Testing SSH connection..."
           ssh -vvv -o StrictHostKeyChecking=no \
               -o UserKnownHostsFile=/dev/null \
               "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" \
-              "echo 'SSH подключение успешно!'"
+              "echo 'SSH connection successful!'"
 
       - name: Deploy to Server
         run: |
@@ -120,7 +120,8 @@ jobs:
                   -e SECRET_KEY='${{ secrets.DJANGO_SECRET_KEY }}' \
                   morgaun/online_work:test"
 
-      - name: Skip deploy notification
-        if: secrets.SSH_KEY == '' || secrets.SSH_USER == '' || secrets.SERVER_IP == ''
-        run:
-          echo "Деплой пропущен: отсутствуют необходимые SSH-секреты"
+  skip-deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ secrets.SSH_KEY == '' || secrets.SSH_USER == '' || secrets.SERVER_IP == '' }}
+
