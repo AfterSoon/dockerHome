@@ -1,6 +1,6 @@
 name: Django CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 env:
   SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
@@ -90,7 +90,7 @@ jobs:
 
       - name: Deploy to server via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no  << 'EOF'
+          ssh -o StrictHostKeyChecking=no dudos@X_MORGAN_X << 'EOF'
             cd habit_tracker
             docker stop habit_tracker || true
             docker rm habit_tracker || true
