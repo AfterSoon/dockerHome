@@ -90,7 +90,7 @@ jobs:
 
       - name: Deploy to server via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no  dudos@158.160.89.227 << 'EOF'
+          ssh -o StrictHostKeyChecking=no  dudos@10.129.0.13 << 'EOF'
             cd habit_tracker
             docker stop habit_tracker || true
             docker rm habit_tracker || true
