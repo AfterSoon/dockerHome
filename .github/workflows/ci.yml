@@ -90,7 +90,7 @@ jobs:
 
       - name: Deploy to server via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no  << 'EOF'
             cd habit_tracker
             docker stop habit_tracker || true
             docker rm habit_tracker || true
