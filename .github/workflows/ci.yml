@@ -82,31 +82,17 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-
-      - name: Set up SSH
+      - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Verify SSH connection
+      - name: Deploy to server via SSH
         run: |
-          echo "Testing SSH connection to server..."
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-              -v \
-              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'SSH connection successful!'"
-
-      - name: Deploy to Server
-        run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-              ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
-              docker pull morgaun/online_work:test && \
-              docker stop online_work || true && \
-              docker rm online_work || true && \
-              docker run -d --name online_work -p 80:8000 \
-                  -e SECRET_KEY='${{ secrets.DJANGO_SECRET_KEY }}' \
-                  morgaun/online_work:test
-          "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd habit_tracker
+            docker stop habit_tracker || true
+            docker rm habit_tracker || true
+            docker run -d --name habit_tracker --env-file $(pwd)/.env -p 80:8000 ${{ secrets.DOCKER_HUB_USER_NAME }}/habit_tracker:${{ github.sha }}
+          EOF
