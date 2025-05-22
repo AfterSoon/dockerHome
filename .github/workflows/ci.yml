@@ -95,7 +95,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no dudos@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -tt StrictHostKeyChecking=no dudos@${{ secrets.SERVER_IP }} << 'EOF'
             cd C:\Users\dudos\PycharmProjects\dockHW
             docker compose down
             docker pull ${{ secrets.DOCKER_HUB_USER_NAME }}/habit_tracker:${{ github.sha }}
