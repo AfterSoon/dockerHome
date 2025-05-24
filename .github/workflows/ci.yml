@@ -96,5 +96,5 @@ jobs:
             --name myapp \
             --restart=always \
             -p 8080:8000 \
-            ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/online_work:${{ github.sha }}
           EOF
