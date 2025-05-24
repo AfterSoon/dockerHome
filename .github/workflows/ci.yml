@@ -70,14 +70,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Build and push
+        uses: docker/build-push-action@v4
         with:
-          context: .
           push: true
-          tags: morgaun/myapp:test
-          build-args: |
-            SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}
 
   deploy:
     needs: build
