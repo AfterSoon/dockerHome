@@ -89,7 +89,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Build Dock image
-        run: docker build -t myapp
+        run: docker build -t myapp .
 
       - name: Deploy to server via SSH
         run: |
