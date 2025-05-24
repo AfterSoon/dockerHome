@@ -91,7 +91,7 @@ jobs:
       - name: Deploy to server via SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            docker rm -f myapp || true
+            docker rm -f online_work || true
           docker run -d \
             --name myapp \
             --restart=always \
