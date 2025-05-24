@@ -75,7 +75,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: morgaun/online_work:test
+          tags: morgaun/myapp:test
           build-args: |
             SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
 
@@ -91,10 +91,10 @@ jobs:
       - name: Deploy to server via SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            docker rm -f online_work || true
+            docker rm -f myapp || true
           docker run -d \
             --name myapp \
             --restart=always \
             -p 8080:8000 \
-            ${{ secrets.DOCKER_USERNAME }}/online_work:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}
           EOF
